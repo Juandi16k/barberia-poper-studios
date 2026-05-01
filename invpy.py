@@ -14,43 +14,66 @@ while True:
     opcion = input("Selecciona una de las opciones...\n")
     
     if opcion =='1':
-        numProductos = int(input("Hola chaval, ingresa el numero de productos que ingresaremos:"))
+        try:
+            numProductos = int(input("Hola chaval, ingresa el numero de productos que ingresaremos:"))
+        except ValueError:
+            print("Que parte de ingresa un NUMERO no entiendes...")
+            continue
         
         if numProductos <= 0:
-          print("Se enloquecio HP, tenes que poner un numero POSITIVO MKON...")
-        for i in range(numProductos):
-          producto = input(f"\nIngresa El nombre del producto #{i + 1}: ")
-          stock = int(input(f"\nIngresa la cantidad de stock que hay para {producto} "))
-    
-          while stock <0:
-            print("\nSe enloquecio mi viejo, stock negativo como asi")
-            stock = int(input(f"\nIngresa la cantidad de stock que hay para {producto} "))
+            print("Se enloquecio HP, tenes que poner un numero POSITIVO MKON...")
+            continue
         
-          if stock <=5 and stock >0:
-              print(f"\nSocio te estas quedando sin stock para:  {producto} ojito ahi hermanazo. ")
-              productoAlerta.append(producto)
-              bajoStock += 1 
+        for i in range(numProductos):
+            producto = input(f"\nIngresa El nombre del producto #{i + 1}: ")
+            stock = int(input(f"\nIngresa la cantidad de stock que hay para {producto} "))
+                
+          
     
-          elif stock >5:
+            while stock <0:
+                 print("\nSe enloquecio mi viejo, stock negativo como asi")
+                 stock = int(input(f"\nIngresa la cantidad de stock que hay para {producto} "))
+            with open("inventario.txt ", "a") as archivo:
+                archivo.write(f"{producto} , {stock}\n")
+        
+            if stock <=5 and stock >0:
+                 print(f"\nSocio te estas quedando sin stock para:  {producto} ojito ahi hermanazo. ")
+                 productoAlerta.append(producto)
+                 bajoStock += 1 
+    
+            elif stock >5:
               print("\nVas pleno de stock mi chamo.")
               buenStock += 1
 
-          else:
+            else:
               print("AGOTADO!!!")
               productoAlerta.append(producto)
               agotado +=1
-        print(f"\nTienes un total de {bajoStock} productos con poco stock , compre pues.")
-        print(f"\nTambien tienes lo que vienen siendo {buenStock} productos con buen stock por ahora")
-        print(f"\nTambien tienes un total de {agotado} productos agotados.. ")
-        print(f"\nLos productos que tendras que reponer lo antes posible serian: {productoAlerta} ")
+        
+        print("\n--- Registro finalizado ---")
+        
+             
     elif opcion == '2': 
-        print("\n" "="*20) 
+        print("\n"+"="*20) 
         print("=====Resumen Actual=====")
-        print(f"Productos que queda poquito: {bajoStock} ")
-        print(f"Buen stock: {buenStock}")
-        print(f"Agotados: {agotado}")
-        print(f"Lista de compras: {list(set(productoAlerta))}")
+        
+        try:
+            with open("inventario.txt" , "r") as archivo:
+                for linea in archivo:
+                    datos = linea.strip().split(",")
+                    nombre = datos[0]
+                    cantidad = int(datos[1])
+                    
+                    estado = "Stock mas bajo de lo recomendado" if cantidad < 5 else "Vamos es plenos de stock"
+                    
+                    print(f"Producto: {nombre:<15} | Stock: {cantidad:<3} | {estado}\n")
+                    
+        except FileNotFoundError:
+            print("Error, chaval no hay nada registrado mano.")
+                       
         print("="*20)
+        
+        
     elif opcion == '3' :
         salir = input("Seguro que quieres salir? s/n\n")
         if salir == "s" :
