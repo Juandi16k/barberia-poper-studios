@@ -1,17 +1,25 @@
+import json
 
-productoAlerta = []
-bajoStock = 0
-buenStock = 0
-agotado = 0
+try:
+    with open("Inventario.json" , "r") as archivo:
+        Inventario = json.load(archivo)
+except (FileNotFoundError,  json.JSONDecodeError): #En caso que no exista o que este dañado creamos uno nuevo con las llaves preestablecidas
+    Inventario = {}
+    with open("Inventario.json" , "w") as archivo:
+        json.dump(Inventario , archivo)
+        print("Archivo Json creado e inicializado con exito...")
+        
+        
+
 while True:
-    print("="*20)
+    print("\n"+"="*20) 
     print("Bienvenido a poperStudios Barberia\n")
     print("=====MENU=====\n")
     print("1.Registrar productos. \n")
     print("2. Ver resumen\n")
     print("3. Salir...\n")
     print("="*20)
-    opcion = input("Selecciona una de las opciones...\n")
+    opcion = input("Selecciona una de las opciones...\n") 
     
     if opcion =='1':
         try:
@@ -26,57 +34,60 @@ while True:
         
         for i in range(numProductos):
             producto = input(f"\nIngresa El nombre del producto #{i + 1}: ")
-            stock = int(input(f"\nIngresa la cantidad de stock que hay para {producto} "))
+
+    
+            while True:
+                try:
+                    stock = int(input(f"\nIngresa la cantidad de stock para {producto}: "))
+                    
+                    if stock <0:
+                        print("\nSe enloquecio mi viejo, stock negativo como asi")
+                        continue
+                    break 
+                except ValueError:
+                    print("Socio que ingrese un NUMEROOOO")
+                        
+            if producto in Inventario:
+                Inventario[producto] += stock
+            else : 
+                Inventario[producto] = stock
                 
-          
-    
-            while stock <0:
-                 print("\nSe enloquecio mi viejo, stock negativo como asi")
-                 stock = int(input(f"\nIngresa la cantidad de stock que hay para {producto} "))
-            with open("inventario.txt ", "a") as archivo:
-                archivo.write(f"{producto} , {stock}\n")
+            totalNuevo = Inventario[producto]
         
-            if stock <=5 and stock >0:
-                 print(f"\nSocio te estas quedando sin stock para:  {producto} ojito ahi hermanazo. ")
-                 productoAlerta.append(producto)
-                 bajoStock += 1 
+            if totalNuevo <=5 and totalNuevo >0:
+                print(f"\nSocio te estas quedando sin stock para:  {producto} ojito ahi hermanazo. ")
     
-            elif stock >5:
-              print("\nVas pleno de stock mi chamo.")
-              buenStock += 1
+            elif totalNuevo >5:
+                print("\nVas pleno de stock mi chamo.")
 
             else:
-              print("AGOTADO!!!")
-              productoAlerta.append(producto)
-              agotado +=1
+                print("AGOTADO!!! ")
         
+        with open("Inventario.json" , "w") as archivo:
+            json.dump(Inventario , archivo , indent=4)
+            
         print("\n--- Registro finalizado ---")
         
-             
+            
+
     elif opcion == '2': 
         print("\n"+"="*20) 
         print("=====Resumen Actual=====")
-        
-        try:
-            with open("inventario.txt" , "r") as archivo:
-                for linea in archivo:
-                    datos = linea.strip().split(",")
-                    nombre = datos[0]
-                    cantidad = int(datos[1])
-                    
-                    estado = "Stock mas bajo de lo recomendado" if cantidad < 5 else "Vamos es plenos de stock"
-                    
-                    print(f"Producto: {nombre:<15} | Stock: {cantidad:<3} | {estado}\n")
-                    
-        except FileNotFoundError:
-            print("Error, chaval no hay nada registrado mano.")
-                       
-        print("="*20)
-        
-        
+        if not Inventario:
+            print("No hay nada creado chaval...")
+        else:
+            for p , s in Inventario.items():   #No olvides el .items para que el programa sepa que p y s al tiempo se leen en Inventario
+                if s ==  0:
+                    estado = f"Noooo mano SE AGOTO EL {p}"
+                elif s <= 5:
+                    estado = f"Stock medio paila para {p}"
+                elif s > 5:
+                    estado = f"Vamos es una chimba mi sooo , pleno stock para {p}"
+                
+                print (f"\nProducto {p:<15} | Stock {s:<5} | {estado}")    
+        print ("\n=" *30)
     elif opcion == '3' :
-        salir = input("Seguro que quieres salir? s/n\n")
-        if salir == "s" :
+        if  input("Seguro que quieres salir? s/n\n").lower() == "s":
             print("Ah listo socio suerte pues...")
             break
     else : 
