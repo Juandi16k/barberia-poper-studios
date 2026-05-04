@@ -17,7 +17,8 @@ while True:
     print("=====MENU=====\n")
     print("1.Registrar productos. \n")
     print("2. Ver resumen\n")
-    print("3. Salir...\n")
+    print("3. Modificar o eliminar producto...\n")
+    print("4. Salir...\n")
     print("="*20)
     opcion = input("Selecciona una de las opciones...\n") 
     
@@ -86,7 +87,30 @@ while True:
                 
                 print (f"\nProducto {p:<15} | Stock {s:<5} | {estado}")    
         print ("\n=" *30)
-    elif opcion == '3' :
+        
+    elif opcion == "3":
+        print("===== MODIFICAR O ELIMINAR =====\n")
+        producto_editar = input("Ingresa el producto que vamos a editar o eliminar: ")
+        
+        if producto_editar in Inventario:
+            print(f"Producto : {producto_editar} | Stock : {Inventario[producto_editar]}\n")
+            accion = input("Quieres (C)ambiar el stock o (E)liminarlo por completo? \n").lower()
+            
+            if accion == "c":
+                nuevo_stock = int(input(f"Ingresa el nuevo stock total para {producto_editar}: "))
+                Inventario[producto_editar ] = nuevo_stock
+                print(f"Stock Actualizado a {Inventario[producto_editar]} para {producto_editar}...")     
+            
+            elif accion == "e":
+                del Inventario[producto_editar]
+                print (f"{producto_editar} ha sido eliminado exitosamente.")
+            
+            with open("Inventario.json" , "w") as archivo : 
+                json.dump(Inventario , archivo , indent = 4)
+                
+        else :
+            print("Este producto no existe en la base de datos actual")
+    elif opcion == '4' :
         if  input("Seguro que quieres salir? s/n\n").lower() == "s":
             print("Ah listo socio suerte pues...")
             break
