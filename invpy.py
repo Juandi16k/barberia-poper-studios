@@ -1,4 +1,8 @@
 import json
+def guardar_objetos(datos):
+    with open("Inventario.json" , "w") as archivo:
+            json.dump(datos , archivo , indent=4)
+    
 
 try:
     with open("Inventario.json" , "r") as archivo:
@@ -34,7 +38,7 @@ while True:
             continue
         
         for i in range(numProductos):
-            producto = input(f"\nIngresa El nombre del producto #{i + 1}: ")
+            producto = input(f"\nIngresa El nombre del producto #{i + 1}: ").lower().strip()
 
     
             while True:
@@ -47,29 +51,24 @@ while True:
                     break 
                 except ValueError:
                     print("Socio que ingrese un NUMEROOOO")
-                        
-            if producto in Inventario:
-                Inventario[producto] += stock
-            else : 
-                Inventario[producto] = stock
-                
-            totalNuevo = Inventario[producto]
-        
-            if totalNuevo <=5 and totalNuevo >0:
-                print(f"\nSocio te estas quedando sin stock para:  {producto} ojito ahi hermanazo. ")
-    
-            elif totalNuevo >5:
-                print("\nVas pleno de stock mi chamo.")
+                    
+            Inventario[producto] = Inventario.get(producto , 0) + stock
+            total = Inventario[producto]
 
+
+
+            if total == 0:
+                print ("SE AGOTÓ MI HERMANO")
+            elif total <= 5:
+                print (f"Ojo que estamos en los rines para {producto}")
             else:
-                print("AGOTADO!!! ")
+                print(f"stock de {producto} al dia mi H...")
         
-        with open("Inventario.json" , "w") as archivo:
-            json.dump(Inventario , archivo , indent=4)
-            
+        guardar_objetos(Inventario)
+
         print("\n--- Registro finalizado ---")
         
-            
+
 
     elif opcion == '2': 
         print("\n"+"="*20) 
@@ -85,28 +84,31 @@ while True:
                 elif s > 5:
                     estado = f"Vamos es una chimba mi sooo , pleno stock para {p}"
                 
-                print (f"\nProducto {p:<15} | Stock {s:<5} | {estado}")    
+                print (f"\nProducto {p.capitalize:<15} | Stock {s:<5} | {estado}")    
         print ("\n=" *30)
         
     elif opcion == "3":
         print("===== MODIFICAR O ELIMINAR =====\n")
-        producto_editar = input("Ingresa el producto que vamos a editar o eliminar: ")
+        producto_editar = input("Ingresa el producto que vamos a editar o eliminar: ").lower().strip()
         
         if producto_editar in Inventario:
-            print(f"Producto : {producto_editar} | Stock : {Inventario[producto_editar]}\n")
+            print(f"Encontrado papacho, Producto : {producto_editar.capitalize:<15} | Stock : {Inventario[producto_editar]:<3}\n")
             accion = input("Quieres (C)ambiar el stock o (E)liminarlo por completo? \n").lower()
             
             if accion == "c":
-                nuevo_stock = int(input(f"Ingresa el nuevo stock total para {producto_editar}: "))
-                Inventario[producto_editar ] = nuevo_stock
-                print(f"Stock Actualizado a {Inventario[producto_editar]} para {producto_editar}...")     
+                while True:
+                    try:
+                        Inventario[producto_editar]= int(input("STOCK REAL: "))
+                        break
+                    except ValueError:
+                        print("Socio que un numero, no ingrese mkdas si? ")
+
             
             elif accion == "e":
                 del Inventario[producto_editar]
                 print (f"{producto_editar} ha sido eliminado exitosamente.")
             
-            with open("Inventario.json" , "w") as archivo : 
-                json.dump(Inventario , archivo , indent = 4)
+            guardar_objetos(Inventario)
                 
         else :
             print("Este producto no existe en la base de datos actual")
